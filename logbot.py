@@ -93,16 +93,16 @@ DEFAULT_TIMEZONE = 'UTC'
 
 default_format = {
     "help" : HELP_MESSAGE,
-    "action" : '<span class="person" style="color:%color%">* %user% %message%</span>',
-    "join" : '-!- <span class="join">%user%</span> [%host%] has joined %channel%',
-    "kick" : '-!- <span class="kick">%user%</span> was kicked from %channel% by %kicker% [%reason%]',
-    "mode" : '-!- mode/<span class="mode">%channel%</span> [%modes% %person%] by %giver%',
-    "nick" : '<span class="nick">%old%</span> is now known as <span class="nick">%new%</span>',
-    "part" : '-!- <span class="part">%user%</span> [%host%] has parted %channel%',
-    "pubmsg" : '<span class="person" style="color:%color%">&lt;%user%&gt;</span> %message%',
-    "pubnotice" : '<span class="notice">-%user%:%channel%-</span> %message%',
-    "quit" : '-!- <span class="quit">%user%</span> has quit [%message%]',
-    "topic" : '<span class="topic">%user%</span> changed topic of <span class="topic">%channel%</span> to: %message%',
+    "action" : '<p class="pperson">%time% <span class="person" style="color:%color%">* %user% %message%</span></p>',
+    "join" : '<p class="pjoin">%time% -!- <span class="join">%user%</span> [%host%] has joined %channel%</p>',
+    "kick" : '<p class="pkick">%time% -!- <span class="kick">%user%</span> was kicked from %channel% by %kicker% [%reason%]</p>',
+    "mode" : '<p class="pmode">%time% -!- mode/<span class="mode">%channel%</span> [%modes% %person%] by %giver%</p>',
+    "nick" : '<p class="pnick">%time% <span class="nick">%old%</span> is now known as <span class="nick">%new%</span></p>',
+    "part" : '<p class="ppart">%time% -!- <span class="part">%user%</span> [%host%] has parted %channel%</p>',
+    "pubmsg" : '<p class="pperson">%time% <span class="person" style="color:%color%">&lt;%user%&gt;</span> %message%</p>',
+    "pubnotice" : '<p class="pnotice">%time% <span class="notice">-%user%:%channel%-</span> %message%</p>',
+    "quit" : '<p class="pquit">%time% -!- <span class="quit">%user%</span> has quit [%message%]</p>',
+    "topic" : '<p class="ptopic">%time% <span class="topic">%user%</span> changed topic of <span class="topic">%channel%</span> to: %message%</p>',
 }
 
 html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -111,6 +111,23 @@ html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>%title%</title>
+    <script>
+        function modClass(c, disp) {
+            var elems = document.querySelectorAll(c);
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.display = disp;
+            }
+        }
+
+        function toggleClass(c) {
+            var elem = document.querySelectorAll(c)[0];
+            if (elem.style.display == "none") {
+                modClass(c, "");
+            } else {
+                modClass(c, "none");
+            }
+        }
+    </script>
     <style type="text/css">
         body {
             background-color: #F8F8FF;
@@ -121,6 +138,10 @@ html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
             font-family: sans-serif;
             font-size: 24px;
             text-align: center;
+        }
+        p {
+            padding: 0;
+            margin: 0;
         }
         a, .time {
             color: #525552;
@@ -135,7 +156,9 @@ html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   </head>
   <body>
   <h1>%title%</h1>
-  <a href="..">Back</a><br />
+  <a href="..">Back</a>
+  <button onclick="toggleClass('.pjoin'); toggleClass('.ppart');">Toggle joins &amp; parts</button>
+  <br />
   </body>
 </html>
 """
@@ -145,7 +168,7 @@ html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 def append_line(filename, line):
     data = open(filename, "rb").readlines()[:-2]
-    data += [line, "\n<br />", "\n</body>", "\n</html>"]
+    data += [line, "\n", "\n</body>", "\n</html>"]
     write_lines(filename, data)
 
 def write_lines(filename, lines):
@@ -342,9 +365,10 @@ class Logbot(SingleServerIRCBot):
             append_line("%s/index.html" % chan_path, '<a href="%s.html">%s</a>' % (date, date))
 
         # Append current message
-        message = "<a href=\"#%s\" name=\"%s\" class=\"time\">[%s]</a> %s" % \
-                                          (time, time, time, msg)
-        append_line(log_path, message)
+        time = "<a href=\"#%s\" name=\"%s\" class=\"time\">[%s]</a>" % \
+                                          (time, time, time)
+        msg = msg.replace("%time%", time)
+        append_line(log_path, msg)
 
     ### These are the IRC events
 
