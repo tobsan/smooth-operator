@@ -130,6 +130,7 @@ html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         .person { color: #DD1144; }
         .join, .part, .quit, .kick, .mode, .topic, .nick { color: #42558C; }
         .notice { color: #AE768C; }
+        .time:target { color: red; }
     </style>
   </head>
   <body>
