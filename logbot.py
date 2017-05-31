@@ -69,15 +69,15 @@ DEBUG = False
 SERVER = "irc.freenode.net"
 PORT = 6667
 SERVER_PASS = None
-CHANNELS=["#excid3","#keryx"]
-NICK = "timber"
+CHANNELS=["#pelux"]
+NICK = "pelux"
 NICK_PASS = ""
 
 # The local folder to save logs
-LOG_FOLDER = "logs"
+LOG_FOLDER = "/var/www/html/"
 
 # The message returned when someone messages the bot
-HELP_MESSAGE = "Check out http://excid3.com"
+HELP_MESSAGE = "Check out http://pelux.io!"
 
 # FTP Configuration
 FTP_SERVER = ""
