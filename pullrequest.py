@@ -45,7 +45,7 @@ class PullRequest:
         try:
             with open(self.seen_prs_file, "r") as f:
                 for line in f.readlines():
-                    if line.strip() == obj["merge_commit_sha"]:
+                    if line.strip() == str(obj["id"]):
                         return True
         except IOError:
             pass
@@ -54,14 +54,16 @@ class PullRequest:
 
     def mark_pr_as_seen(self, obj):
         with open(self.seen_prs_file, "a") as f:
-            f.write(obj["merge_commit_sha"] + "\n")
+            f.write(str(obj["id"]) + "\n")
 
 
     def prettyprint(self, repo_name, obj):
-        return "New PR in " + repo_name \
-                            + ": '" + obj["title"] \
-                            + "' by " \
-                            + obj["user"]["login"]
+        return "New PR in " + repo_name             \
+                            + ": '" + obj["title"]  \
+                            + "' by "               \
+                            + obj["user"]["login"]  \
+                            + " - "                 \
+                            + obj["html_url"]
 
     def check_all(self):
         for repo in self.repos:
