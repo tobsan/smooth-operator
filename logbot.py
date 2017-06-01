@@ -51,8 +51,11 @@ except:
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
+import time
+from threading import Timer
 
 import re
+from pullrequest import PullRequest
 
 pat1 = re.compile(r"(^|[\n ])(([\w]+?://[\w\#$%&~.\-;:=,?@\[\]+]*)(/[\w\#$%&~/.\-;:=,?@\[\]+]*)?)", re.IGNORECASE | re.DOTALL)
 
@@ -370,6 +373,16 @@ class Logbot(SingleServerIRCBot):
         msg = msg.replace("%time%", time)
         append_line(log_path, msg)
 
+    def check_for_prs(self, c):
+        p = PullRequest()
+        for line in p.check_all():
+            message = line["message"]
+            channel = line["channel"]
+            c.privmsg(channel, message)
+            time.sleep(1)
+
+        Timer(60*5, self.check_for_prs, [c]).start()
+
     ### These are the IRC events
 
     def on_all_raw_messages(self, c, e):
@@ -383,6 +396,9 @@ class Logbot(SingleServerIRCBot):
 
         for chan in self.chans:
             c.join(chan)
+
+        self.check_for_prs(c)
+
 
     def on_nicknameinuse(self, c, e):
         """Nickname in use"""
