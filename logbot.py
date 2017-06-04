@@ -339,7 +339,7 @@ def main():
     # Start up database
     create_tables()
 
-    t = threading.Thread(target=flaskapp.run, args=())
+    t = threading.Thread(target=flaskapp.run, kwargs={"host": "0.0.0.0"})
     t.start()
 
     # Create the logs directory
