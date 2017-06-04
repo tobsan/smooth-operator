@@ -1,0 +1,6 @@
+<!doctype html>
+<title>List of channels</title>
+
+{% for channel in channels %}
+    <li><a href="/channel/{{ channel.name|urlencode }}">{{ channel.name }}</a></li>
+{% endfor %}

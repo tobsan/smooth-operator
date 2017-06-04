@@ -1,0 +1,186 @@
+<!doctype html>
+<head>
+    <title>List of messages</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<div id="navbar">
+    {% if back_button %}
+    <a href="..">Back</a>
+    {% endif %}
+
+    <form id="searchform" method="get" action="/search/channel/{{channel.name|urlencode}}/">
+        <input type="text" name="query"/>
+        <input type="submit" value="Search"/>
+    </form>
+</div>
+
+{% for message in messages %}
+    {% if message.message_type == "pubmsg" %}
+        <p class="pubmsg" id="{{message.datetime}}">
+            <a href="#{{message.datetime}}">
+                <span class="date">
+                    {% if date %}
+                        {{ message.day.date }}
+                    {% endif %}
+                    {{message.datetime}}
+                </span>
+            </a>
+            <span class="chat_message_marker">
+                &lt;
+            </span>
+            <span class="nickname">
+                {{ message.nickname }}
+            </span>
+            <span class="chat_message_marker">
+                &gt;
+            </span>
+            <span class="chat_message">
+                {{ message.message }}
+            </span>
+        </p>
+    {% elif message.message_type == "join" %}
+    <p class="join" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="marker">
+            -!-
+        </span>
+        <span class="message">
+            {{ message.nickname }} joined {{ message.channel.name }}
+        </span>
+    </p>
+    {% elif message.message_type == "nick" %}
+    <p class="nick" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="marker">
+            -!-
+        </span>
+        <span class="old">
+            {{ message.nickname }}
+        </span>
+        <span>
+            is now known as
+        </span>
+        <span class="new">
+            {{ message.message }}
+        </span>
+    </p>
+    {% elif message.message_type == "action" %}
+    <p class="action" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="nick">
+            {{ message.nickname }}
+        </span>
+        <span class="message">
+            {{ message.message }}
+        </span>
+    </p>
+    {% elif message.message_type == "kick" %}
+    <p class="kick" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="marker">
+            -!-
+        </span>
+        <span class="message">
+            {{ message.message }}
+        </span>
+    </p>
+    {% elif message.message_type == "mode" %}
+    <p class="mode" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="marker">
+            -!-
+        </span>
+        <span class="message">
+            {{ message.message }}
+        </span>
+    </p>
+    {% elif message.message_type == "part" %}
+    <p class="part" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="user">
+            {{ message.nickname }}
+        </span>
+        <span class="text">
+            left channel
+        </span>
+        <span class="channel">
+            {{ message.channel.name }}
+        </span>
+        <span class="text">
+            with reason:
+        </span>
+        <span class="message">
+            {{ message.message }}
+        </span>
+    </p>
+    {% elif message.message_type == "topic" %}
+    <p class="topic" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="user">
+            {{ message.nickname }}
+        </span>
+        <span class="text">
+            changed topic of
+        </span>
+        <span class="channel">
+            {{ message.channel.name }}
+        </span>
+        <span class="text">
+            to:
+        </span>
+        <span class="message">
+            {{ message.message }}
+        </span>
+    </p>
+    {% endif %}
+{% endfor %}

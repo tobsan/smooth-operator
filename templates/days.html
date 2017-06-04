@@ -1,0 +1,24 @@
+<!doctype html>
+<head>
+    <title>Days with logs for {{ channel.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<div id="navbar">
+    {% if back_button %}
+    <a href="..">Back</a>
+    {% endif %}
+
+    <form id="searchform" method="get" action="/search/channel/{{channel.name|urlencode}}/">
+        <input type="text" name="query"/>
+        <input type="submit" value="Search"/>
+    </form>
+</div>
+
+{% for day in days %}
+<li>
+    <a href="/channels/{{ channel.name|urlencode }}/{{ day.date }}">
+        {{ day.date }}
+    </a>
+</li>
+{% endfor %}

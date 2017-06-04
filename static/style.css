@@ -1,0 +1,49 @@
+body {
+    background-color: #F8F8FF;
+    font-family: Fixed, monospace;
+    font-size: 13px;
+}
+
+#searchform {
+    display: inline;
+}
+
+#navbar {
+    margin-bottom: 20px;
+}
+
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+p:target {
+    background-color:#ffcccc
+}
+
+p:target a {
+    color:red;
+}
+
+.join .marker {
+    color: blue;
+}
+
+.action .nick {
+    color: gray;
+    font-style: italic;
+}
+
+.action .message {
+    color: gray;
+    font-style: italic;
+}
+a:link {
+    color: black;
+    text-decoration: none;
+}
+
+a:focus {
+    color: red;
+}
+

@@ -56,10 +56,16 @@ from threading import Timer
 
 import re
 from pullrequest import PullRequest
+from Db import *
+from flask import *
+import threading
 
 pat1 = re.compile(r"(^|[\n ])(([\w]+?://[\w\#$%&~.\-;:=,?@\[\]+]*)(/[\w\#$%&~/.\-;:=,?@\[\]+]*)?)", re.IGNORECASE | re.DOTALL)
 
 #urlfinder = re.compile("(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
+
+flaskapp = Flask(__name__)
+flaskapp.config["TEMPLATES_AUTO_RELOAD"] = True
 
 def urlify2(value):
     return pat1.sub(r'\1<a href="\2" target="_blank">\3</a>', value)
@@ -91,80 +97,63 @@ FTP_FOLDER = ""
 # The amount of messages to wait before uploading to the FTP server
 FTP_WAIT = 25
 
-CHANNEL_LOCATIONS_FILE = os.path.expanduser("~/.logbot-channel_locations.conf")
 DEFAULT_TIMEZONE = 'UTC'
 
-default_format = {
-    "help" : HELP_MESSAGE,
-    "action" : '<p class="pperson">%time% <span class="person" style="color:%color%">* %user% %message%</span></p>',
-    "join" : '<p class="pjoin">%time% -!- <span class="join">%user%</span> [%host%] has joined %channel%</p>',
-    "kick" : '<p class="pkick">%time% -!- <span class="kick">%user%</span> was kicked from %channel% by %kicker% [%reason%]</p>',
-    "mode" : '<p class="pmode">%time% -!- mode/<span class="mode">%channel%</span> [%modes% %person%] by %giver%</p>',
-    "nick" : '<p class="pnick">%time% <span class="nick">%old%</span> is now known as <span class="nick">%new%</span></p>',
-    "part" : '<p class="ppart">%time% -!- <span class="part">%user%</span> [%host%] has parted %channel%</p>',
-    "pubmsg" : '<p class="pperson">%time% <span class="person" style="color:%color%">&lt;%user%&gt;</span> %message%</p>',
-    "pubnotice" : '<p class="pnotice">%time% <span class="notice">-%user%:%channel%-</span> %message%</p>',
-    "quit" : '<p class="pquit">%time% -!- <span class="quit">%user%</span> has quit [%message%]</p>',
-    "topic" : '<p class="ptopic">%time% <span class="topic">%user%</span> changed topic of <span class="topic">%channel%</span> to: %message%</p>',
-}
+### Web interface
 
-html_header = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>%title%</title>
-    <script>
-        function modClass(c, disp) {
-            var elems = document.querySelectorAll(c);
-            for (var i = 0; i < elems.length; i++) {
-                elems[i].style.display = disp;
-            }
-        }
+@flaskapp.route("/search/nickname/<nickname>/")
+@flaskapp.route("/search/channel/<channel>/")
+@flaskapp.route("/search/")
+def search(channel = None, nickname = None):
+    messages = []
+    query = request.args.get('query')
+    if channel:
+        try:
+            channel = Channel.get(Channel.name == channel)
+            messages = LogMessage.select()                                  \
+                                 .where(LogMessage.channel == channel and   \
+                                        LogMessage.message.contains(query))
+        except:
+            pass # No such channel
+    elif nickname:
+        messages = LogMessage.select()                                  \
+                             .where(LogMessage.nickname == nickname and   \
+                                    LogMessage.message.contains(query))
+    else:
+        messages = LogMessage.select()                                  \
+                             .where(LogMessage.message.contains(query))
 
-        function toggleClass(c) {
-            var elem = document.querySelectorAll(c)[0];
-            if (elem.style.display == "none") {
-                modClass(c, "");
-            } else {
-                modClass(c, "none");
-            }
-        }
-    </script>
-    <style type="text/css">
-        body {
-            background-color: #F8F8FF;
-            font-family: Fixed, monospace;
-            font-size: 13px;
-        }
-        h1 {
-            font-family: sans-serif;
-            font-size: 24px;
-            text-align: center;
-        }
-        p {
-            padding: 0;
-            margin: 0;
-        }
-        a, .time {
-            color: #525552;
-            text-decoration: none;
-        }
-        a:hover, .time:hover { text-decoration: underline; }
-        .person { color: #DD1144; }
-        .join, .part, .quit, .kick, .mode, .topic, .nick { color: #42558C; }
-        .notice { color: #AE768C; }
-        .time:target { color: red; }
-    </style>
-  </head>
-  <body>
-  <h1>%title%</h1>
-  <a href="..">Back</a>
-  <button onclick="toggleClass('.pjoin'); toggleClass('.ppart');">Toggle joins &amp; parts</button>
-  <br />
-  </body>
-</html>
-"""
+    return render_template("messages.html",
+            messages=messages,
+            back_button=False,
+            date=True,
+            channel=channel)
+
+@flaskapp.route("/channels/<channel>/")
+@flaskapp.route("/channels/<channel>/<day>/")
+def channel(channel, day = None, query = None):
+    channel = Channel.get(Channel.name == channel)
+
+    if day:
+        d = Day.get(Day.date == day)
+        messages = LogMessage.select()                              \
+                             .where(LogMessage.day == d and         \
+                                    LogMessage.channel == channel)
+
+        return render_template("messages.html",
+                messages=messages,
+                back_button=True,
+                date=False,
+                channel=channel)
+    else:
+        days = LogMessage.select(LogMessage.day).distinct()
+        days = [ day.day for day in days ]
+        return render_template("days.html", back_button=True, days=days, channel=channel)
+
+@flaskapp.route("/")
+@flaskapp.route("/channels/")
+def channels():
+    return render_template("channels.html", back_button=True, channels = Channel.select())
 
 
 ### Helper functions
@@ -198,58 +187,20 @@ def pairs(items):
     while True:
         yield next(items), next(items)
 
-def html_color(input):
-    """
-    >>> html_color("This is plain but [30m this is in color")
-    'This is plain but <span style="color: #000316"> this is in color</span>'
-    >>> html_color("[32mtwo[37mcolors")
-    '<span style="color: #00aa00">two</span><span style="color: #F5F1DE">colors</span>'
-    """
-    first = []
-    parts = color_pattern.split(input)
-    if len(parts) % 2:
-        # an odd number of parts occurred - first part is uncolored
-        first = [parts.pop(0)]
-    rest = itertools.starmap(replace_color, pairs(parts))
-    return ''.join(itertools.chain(first, rest))
-
-def replace_color(code, text):
-    code = code.lstrip('[').rstrip('m')
-    colors = {
-        '30': '000316',
-        '31': 'aa0000',
-        '32': '00aa00',
-        '33': 'aa5500',
-        '34': '0000aa',
-        '35': 'E850A8',
-        '36': '00aaaa',
-        '37': 'F5F1DE',
-    }
-    if code not in colors:
-        return text
-    return '<span style="color: #%(color)s">%(text)s</span>' % dict(
-        color = colors[code],
-        text = text,
-    )
-
-
 ### Logbot class
 
 class Logbot(SingleServerIRCBot):
     def __init__(self, server, port, server_pass=None, channels=[],
-                 nick="timber", nick_pass=None, format=default_format):
+                 nick="pelux", nick_pass=None):
         SingleServerIRCBot.__init__(self,
                                     [(server, port, server_pass)],
                                     nick,
                                     nick)
 
         self.chans = [x.lower() for x in channels]
-        self.format = format
         self.set_ftp()
-        self.count = 0
         self.nick_pass = nick_pass
 
-        self.load_channel_locations()
         print "Logbot %s" % __version__
         print "Connecting to %s:%i..." % (server, port)
         print "Press Ctrl-C to quit"
@@ -263,115 +214,24 @@ class Logbot(SingleServerIRCBot):
     def set_ftp(self, ftp=None):
         self.ftp = ftp
 
-    def format_event(self, name, event, params):
-        msg = self.format[name]
-        for key, val in params.iteritems():
-            msg = msg.replace(key, val)
-
-        # Always replace %user% with e.source()
-        # and %channel% with e.target()
-        msg = msg.replace("%user%", nm_to_n(event.source()))
-        msg = msg.replace("%host%", event.source())
-        try: msg = msg.replace("%channel%", event.target())
-        except: pass
-        msg = msg.replace("%color%", self.color(nm_to_n(event.source())))
-        try:
-            user_message = cgi.escape(event.arguments()[0])
-            msg = msg.replace("%message%", html_color(user_message))
-        except: pass
-
-        return msg
-
-    def write_event(self, name, event, params={}):
-        # Format the event properly
-        if name == 'nick' or name == 'quit':
-          chans = params["%chan%"]
+    def write_event(self, event_name, event, params={}):
+        if event_name == "nick":
+            message = params["new"]
+        elif event_name == "kick":
+            message = "%s kicked %s from %s. Reason: %s" % (nm_to_n(params["kicker"]),
+                    params["user"], params["channel"], params["reason"])
+        elif event_name == "mode":
+            message = "%s changed mode on %s: %s" % (params["giver"],
+                    params["person"], params["modes"])
+        elif len(event.arguments()) > 0:
+            message = event.arguments()[0]
         else:
-          chans = event.target()
-        msg = self.format_event(name, event, params)
-        msg = urlify2(msg)
+            message = ""
 
-        # In case there are still events that don't supply a channel name (like /quit and /nick did)
-        if not chans or not chans.startswith("#"):
-            chans = self.chans
-        else:
-            chans = [chans]
-
-        for chan in chans:
-            self.append_log_msg(chan, msg)
-
-        self.count += 1
-
-        if self.ftp and self.count > FTP_WAIT:
-            self.count = 0
-            print "Uploading to FTP..."
-            for root, dirs, files in os.walk("logs"):
-                #TODO: Create folders
-
-                for fname in files:
-                    full_fname = os.path.join(root, fname)
-
-                    if sys.platform == 'win32':
-                        remote_fname = "/".join(full_fname.split("\\")[1:])
-                    else:
-                        remote_fname = "/".join(full_fname.split("/")[1:])
-                    if DEBUG: print repr(remote_fname)
-
-                    # Upload!
-                    try: self.ftp.storbinary("STOR %s" % remote_fname, open(full_fname, "rb"))
-                    # Folder doesn't exist, try creating it and storing again
-                    except ftplib.error_perm, e: #code, error = str(e).split(" ", 1)
-                        if str(e).split(" ", 1)[0] == "553":
-                            self.ftp.mkd(os.path.dirname(remote_fname))
-                            self.ftp.storbinary("STOR %s" % remote_fname, open(full_fname, "rb"))
-                        else: raise e
-                    # Reconnect on timeout
-                    except ftplib.error_temp, e: self.set_ftp(connect_ftp())
-                    # Unsure of error, try reconnecting
-                    except:                      self.set_ftp(connect_ftp())
-
-            print "Finished uploading"
-
-    def append_log_msg(self, channel, msg):
-        print "%s >>> %s" % (channel, msg)
-        #Make sure the channel is always lowercase to prevent logs with other capitalisations to be created
-        channel_title = channel
-        channel = channel.lower()
-
-        # Create the channel path if necessary
-        chan_path = "%s/%s" % (LOG_FOLDER, channel)
-        if not os.path.exists(chan_path):
-            os.makedirs(chan_path)
-
-            # Create channel index
-            write_string("%s/index.html" % chan_path, html_header.replace("%title%", "%s | Logs" % channel_title))
-
-            # Append channel to log index
-            append_line("%s/index.html" % LOG_FOLDER, '<a href="%s/index.html">%s</a>' % (channel.replace("#", "%23"), channel_title))
-
-        # Current log
-        try:
-            localtime = datetime.now(timezone(self.channel_locations.get(channel,DEFAULT_TIMEZONE)))
-            time = localtime.strftime("%H:%M:%S")
-            date = localtime.strftime("%Y-%m-%d")
-        except:
-            time = strftime("%H:%M:%S")
-            date = strftime("%Y-%m-%d")
-
-        log_path = "%s/%s/%s.html" % (LOG_FOLDER, channel, date)
-
-        # Create the log date index if it doesnt exist
-        if not os.path.exists(log_path):
-            write_string(log_path, html_header.replace("%title%", "%s | Logs for %s" % (channel_title, date)))
-
-            # Append date log
-            append_line("%s/index.html" % chan_path, '<a href="%s.html">%s</a>' % (date, date))
-
-        # Append current message
-        time = "<a href=\"#%s\" name=\"%s\" class=\"time\">[%s]</a>" % \
-                                          (time, time, time)
-        msg = msg.replace("%time%", time)
-        append_line(log_path, msg)
+        add_log_message(event.target(),
+                nm_to_n(event.source()),
+                event_name,
+                message)
 
     def check_for_prs(self, c):
         p = PullRequest()
@@ -420,17 +280,17 @@ class Logbot(SingleServerIRCBot):
 
     def on_kick(self, c, e):
         self.write_event("kick", e,
-                         {"%kicker%" : e.source(),
-                          "%channel%" : e.target(),
-                          "%user%" : e.arguments()[0],
-                          "%reason%" : e.arguments()[1],
+                         {"kicker" : e.source(),
+                          "channel" : e.target(),
+                          "user" : e.arguments()[0],
+                          "reason" : e.arguments()[1],
                          })
 
     def on_mode(self, c, e):
         self.write_event("mode", e,
-                         {"%modes%" : e.arguments()[0],
-                          "%person%" : e.arguments()[1] if len(e.arguments()) > 1 else e.target(),
-                          "%giver%" : nm_to_n(e.source()),
+                         {"modes" : e.arguments()[0],
+                          "person" : e.arguments()[1] if len(e.arguments()) > 1 else e.target(),
+                          "giver" : nm_to_n(e.source()),
                          })
 
     def on_nick(self, c, e):
@@ -439,25 +299,25 @@ class Logbot(SingleServerIRCBot):
         for chan in self.channels:
             if old_nick in [x.lstrip('~%&@+') for x in self.channels[chan].users()]:
                 self.write_event("nick", e,
-                             {"%old%" : old_nick,
-                              "%new%" : e.target(),
-                              "%chan%": chan,
+                             {"old" : old_nick,
+                              "new" : e.target(),
+                              "chan": chan,
                              })
 
     def on_part(self, c, e):
         self.write_event("part", e)
 
     def on_pubmsg(self, c, e):
-        if e.arguments()[0].startswith(NICK):
-            c.privmsg(e.target(), self.format["help"])
+#        if e.arguments()[0].startswith(NICK):
+#            c.privmsg(e.target(), self.format["help"])
         self.write_event("pubmsg", e)
 
     def on_pubnotice(self, c, e):
         self.write_event("pubnotice", e)
 
     def on_privmsg(self, c, e):
-        print nm_to_n(e.source()), e.arguments()
-        c.privmsg(nm_to_n(e.source()), self.format["help"])
+#        c.privmsg(nm_to_n(e.source()), self.format["help"])
+        pas
 
     def on_quit(self, c, e):
         nick = nm_to_n(e.source())
@@ -469,14 +329,6 @@ class Logbot(SingleServerIRCBot):
     def on_topic(self, c, e):
         self.write_event("topic", e)
 
-    # Loads the channel - timezone-location pairs from the CHANNEL_LOCATIONS_FILE
-    # See the README for details and example
-    def load_channel_locations(self):
-        self.channel_locations = {}
-        if os.path.exists(CHANNEL_LOCATIONS_FILE):
-            f = open(CHANNEL_LOCATIONS_FILE, 'r')
-            self.channel_locations = dict((k.lower(), v) for k, v in dict([line.strip().split(None,1) for line in f.readlines()]).iteritems())
-
 def connect_ftp():
     print "Using FTP %s..." % (FTP_SERVER)
     f = ftplib.FTP(FTP_SERVER, FTP_USER, FTP_PASS)
@@ -484,6 +336,12 @@ def connect_ftp():
     return f
 
 def main():
+    # Start up database
+    create_tables()
+
+    t = threading.Thread(target=flaskapp.run, args=())
+    t.start()
+
     # Create the logs directory
     if not os.path.exists(LOG_FOLDER):
         os.makedirs(LOG_FOLDER)
@@ -500,6 +358,7 @@ def main():
     except KeyboardInterrupt:
         if FTP_SERVER: bot.ftp.quit()
         bot.quit()
+        t.join()
 
 
 if __name__ == "__main__":

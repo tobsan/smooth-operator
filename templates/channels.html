@@ -1,0 +1,20 @@
+<!doctype html>
+<head>
+    <title>List of channels</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<div id="navbar">
+    {% if back_button %}
+    <a href="..">Back</a>
+    {% endif %}
+
+    <form id="searchform" method="get" action="/search/">
+        <input type="text" name="query"/>
+        <input type="submit" value="Search"/>
+    </form>
+</div>
+
+{% for channel in channels %}
+    <li><a href="/channels/{{ channel.name|urlencode }}">{{ channel.name }}</a></li>
+{% endfor %}
