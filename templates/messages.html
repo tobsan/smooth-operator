@@ -29,7 +29,7 @@
             <span class="chat_message_marker">
                 &lt;
             </span>
-            <span class="nickname">
+            <span class="nickname" style='color: #{{message.nickname|md5|truncate(6,True,'')}}'>
                 {{ message.nickname }}
             </span>
             <span class="chat_message_marker">

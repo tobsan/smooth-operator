@@ -67,6 +67,10 @@ pat1 = re.compile(r"(^|[\n ])(([\w]+?://[\w\#$%&~.\-;:=,?@\[\]+]*)(/[\w\#$%&~/.\
 flaskapp = Flask(__name__)
 flaskapp.config["TEMPLATES_AUTO_RELOAD"] = True
 
+@flaskapp.template_filter('md5')
+def format_md5(value):
+    return md5(value).hexdigest()
+
 def urlify2(value):
     return pat1.sub(r'\1<a href="\2" target="_blank">\3</a>', value)
     #return urlfinder.sub(r'<a href="\1">\1</a>', value)
