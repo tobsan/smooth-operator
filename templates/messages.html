@@ -182,5 +182,22 @@
             {{ message.message }}
         </span>
     </p>
+    {% elif message.message_type == "quit" %}
+    <p class="quit" id="{{message.datetime}}">
+        <a href="#{{message.datetime}}">
+            <span class="date">
+                {% if date %}
+                    {{ message.day.date }}
+                {% endif %}
+                {{message.datetime}}
+            </span>
+        </a>
+        <span class="marker">
+            -!-
+        </span>
+        <span class="message">
+            {{ message.message }}
+        </span>
+    </p>
     {% endif %}
 {% endfor %}
