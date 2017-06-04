@@ -215,6 +215,8 @@ class Logbot(SingleServerIRCBot):
         self.ftp = ftp
 
     def write_event(self, event_name, event, params={}):
+        target = event.target()
+
         if event_name == "nick":
             message = params["new"]
         elif event_name == "kick":
@@ -223,12 +225,16 @@ class Logbot(SingleServerIRCBot):
         elif event_name == "mode":
             message = "%s changed mode on %s: %s" % (params["giver"],
                     params["person"], params["modes"])
+        elif event_name == "quit":
+            target = params["chan"]
+            message = "%s has quit" % nm_to_n(event.source())
         elif len(event.arguments()) > 0:
             message = event.arguments()[0]
         else:
             message = ""
 
-        add_log_message(event.target(),
+
+        add_log_message(target,
                 nm_to_n(event.source()),
                 event_name,
                 message)
@@ -324,7 +330,7 @@ class Logbot(SingleServerIRCBot):
         # Only write the event on channels that actually had the user in the channel
         for chan in self.channels:
             if nick in [x.lstrip('~%&@+') for x in self.channels[chan].users()]:
-                self.write_event("quit", e, {"%chan%" : chan})
+                self.write_event("quit", e, {"chan" : chan})
 
     def on_topic(self, c, e):
         self.write_event("topic", e)
