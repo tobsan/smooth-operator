@@ -18,4 +18,4 @@ Configuration is done inside logbot.py.
 
     python logbot.py
 
-Example logs at https://raw.github.com/excid3/logbot/master/example_logs/2011-10-22.html
+You can view logs on http://localhost:5000
