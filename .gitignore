@@ -1,1 +1,4 @@
 *.pyc
+irc.db
+seen_prs
+
