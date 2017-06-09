@@ -57,4 +57,4 @@ def add_log_message(channel, nickname, message_type, message = None):
 
 def show_all_messages():
     for message in LogMessage.select():
-        print "<%s> %s" % (message.nickname, message.message)
+        print("<%s> %s" % (message.nickname, message.message))

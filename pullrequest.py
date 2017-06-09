@@ -69,7 +69,7 @@ class PullRequest:
         for repo in self.repos:
             r = requests.get(repo["uri"])
             if r.status_code != 200:
-                print "Error fetching %s", repo["name"]
+                print("Error fetching %s", repo["name"])
                 break
 
             prs = r.json()
@@ -83,4 +83,4 @@ class PullRequest:
 if __name__ == "__main__":
     p = PullRequest()
     for line in p.check_all():
-        print line["message"]
+        print(line["message"])

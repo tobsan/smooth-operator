@@ -164,18 +164,17 @@ def channels():
 
 def append_line(filename, line):
     data = open(filename, "rb").readlines()[:-2]
-    data += [line, "\n", "\n</body>", "\n</html>"]
+    data += [line.encode(), "\n".encode(), "\n</body>".encode(), "\n</html>".encode()]
     write_lines(filename, data)
 
 def write_lines(filename, lines):
-    f = open(filename, "wb")
-    f.writelines(lines)
-    f.close()
+    with open(filename, "wb") as f:
+        f.writelines(lines)
+
 
 def write_string(filename, string):
-    f = open(filename, "wb")
-    f.write(string)
-    f.close()
+    with open(filename, "wb") as f:
+        f.write(string.encode())
 
 color_pattern = re.compile(r'(\[\d{1,2}m)')
 "Pattern that matches ANSI color codes and the text that follows"
@@ -205,15 +204,15 @@ class Logbot(SingleServerIRCBot):
         self.set_ftp()
         self.nick_pass = nick_pass
 
-        print "Logbot %s" % __version__
-        print "Connecting to %s:%i..." % (server, port)
-        print "Press Ctrl-C to quit"
+        print("Logbot %s" % __version__)
+        print("Connecting to %s:%i..." % (server, port))
+        print("Press Ctrl-C to quit")
 
     def quit(self):
         self.connection.disconnect("Quitting...")
 
     def color(self, user):
-        return "#%s" % md5(user).hexdigest()[:6]
+        return "#%s" % md5(user.encode()).hexdigest()[:6]
 
     def set_ftp(self, ftp=None):
         self.ftp = ftp
@@ -257,7 +256,7 @@ class Logbot(SingleServerIRCBot):
 
     def on_all_raw_messages(self, c, e):
         """Display all IRC connections in terminal"""
-        if DEBUG: print e.arguments()[0]
+        if DEBUG: print(e.arguments()[0])
 
     def on_welcome(self, c, e):
         """Join channels after successful connection"""
@@ -327,7 +326,7 @@ class Logbot(SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
 #        c.privmsg(nm_to_n(e.source()), self.format["help"])
-        pas
+        pass
 
     def on_quit(self, c, e):
         nick = nm_to_n(e.source())
@@ -340,7 +339,7 @@ class Logbot(SingleServerIRCBot):
         self.write_event("topic", e)
 
 def connect_ftp():
-    print "Using FTP %s..." % (FTP_SERVER)
+    print("Using FTP %s..." % (FTP_SERVER))
     f = ftplib.FTP(FTP_SERVER, FTP_USER, FTP_PASS)
     f.cwd(FTP_FOLDER)
     return f
