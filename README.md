@@ -1,21 +1,23 @@
-LogBot 0.4.2
-============
+# smooth-operator
 
-Written by Chris Oliver <chris@excid3.com>
+smooth-operator is a IRC bot which logs everything in a channel and offers more convinient things like notifications about new commits on GitHub, etc. For a roadmap please check the issues on GitHub.
 
-Many thanks to Filip Slagter for his contributions.
+Originally this was written by Chris Oliver <chris@excid3.com> with contributions from Filip Slagter. Now it has diverged quite a lot.
 
-Requirements
-------------
-LogBot shows logs using flask, and stores logs using peewee. Install these dependencies using ``pip``:
+## Requirements
+
+smooth-operator shows logs using flask, and stores logs using peewee. Install these dependencies using ``pip``:
 
     pip install flask peewee
 
-Usage
------
-LogBot requires Python 2. It is NOT compatible with Python 3.
-Configuration is done inside logbot.py.
+## Usage
 
-    python logbot.py
+smooth-operator requires Python 2. It is NOT compatible with Python 3. The Configuration is done inside logbot.py.
 
-You can view logs on http://localhost:5000
+    python2 logbot.py
+
+You can view the logs on http://localhost:5000
+
+## License
+
+This project is licensed under the GPLv2.
