@@ -79,12 +79,12 @@ def urlify2(value):
 DEBUG = False
 
 # IRC Server Configuration
-SERVER = "irc.freenode.net"
-PORT = 6667
-SERVER_PASS = None
-CHANNELS=["#pelux"]
-NICK = "pelux"
-NICK_PASS = ""
+SERVER = os.getenv("IRC_SERVER", "irc.freenode.net")
+PORT = os.getenv("IRC_PORT", 6667)
+SERVER_PASS = os.getenv("IRC_SERVER_PASS", None)
+CHANNELS = os.getenv("IRC_CHANNELS", "#pelux").split(",")
+NICK = os.getenv("IRC_NICK", "pelux")
+NICK_PASS = os.getenv("IRC_NICK_PASS", "")
 
 # The local folder to save logs
 LOG_FOLDER = "/var/www/html/"

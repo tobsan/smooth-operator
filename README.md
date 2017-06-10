@@ -12,7 +12,16 @@ smooth-operator shows logs using flask, and stores logs using peewee. Install th
 
 ## Usage
 
-smooth-operator requires Python 2. It is NOT compatible with Python 3. The Configuration is done inside logbot.py.
+smooth-operator requires Python 2. It is NOT compatible with Python 3. Configuration is either done inside logbot.py, or using environment variables. The following environment variables are respected:
+
+- ``IRC_SERVER``: IRC server
+- ``IRC_PORT``: IRC server port
+- ``IRC_SERVER_PASS``: Password for IRC server, if any
+- ``IRC_CHANNELS``: IRC channels to join, separated by ``,``
+- ``IRC_NICK``: Nickname
+- ``IRC_NICK_PASS``: Password to use when authenticating to nickserv, if any
+
+The bot can be launched using:
 
     python2 logbot.py
 
