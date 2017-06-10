@@ -350,6 +350,7 @@ def main():
     create_tables()
 
     t = threading.Thread(target=flaskapp.run, kwargs={"host": "0.0.0.0"})
+    t.daemon = True
     t.start()
 
     # Create the logs directory
@@ -368,7 +369,6 @@ def main():
     except KeyboardInterrupt:
         if FTP_SERVER: bot.ftp.quit()
         bot.quit()
-        t.join()
 
 
 if __name__ == "__main__":
