@@ -115,13 +115,13 @@ def search(channel = None, nickname = None):
         try:
             channel = Channel.get(Channel.name == channel)
             messages = LogMessage.select()                                  \
-                                 .where(LogMessage.channel == channel and   \
+                                 .where(LogMessage.channel == channel,      \
                                         LogMessage.message.contains(query))
         except:
             pass # No such channel
     elif nickname:
         messages = LogMessage.select()                                  \
-                             .where(LogMessage.nickname == nickname and   \
+                             .where(LogMessage.nickname == nickname,    \
                                     LogMessage.message.contains(query))
     else:
         messages = LogMessage.select()                                  \
@@ -135,13 +135,13 @@ def search(channel = None, nickname = None):
 
 @flaskapp.route("/channels/<channel>/")
 @flaskapp.route("/channels/<channel>/<day>/")
-def channel(channel, day = None, query = None):
+def channel(channel, day = None):
     channel = Channel.get(Channel.name == channel)
 
     if day:
         d = Day.get(Day.date == day)
         messages = LogMessage.select()                              \
-                             .where(LogMessage.day == d and         \
+                             .where(LogMessage.day == d,            \
                                     LogMessage.channel == channel)
 
         return render_template("messages.html",
