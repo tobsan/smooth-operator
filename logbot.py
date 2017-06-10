@@ -222,6 +222,7 @@ class Logbot(SingleServerIRCBot):
 
         if event_name == "nick":
             message = params["new"]
+            target = params["chan"]
         elif event_name == "kick":
             message = "%s kicked %s from %s. Reason: %s" % (nm_to_n(params["kicker"]),
                     params["user"], params["channel"], params["reason"])
