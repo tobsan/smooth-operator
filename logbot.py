@@ -59,6 +59,7 @@ from pullrequest import PullRequest
 from Db import *
 from flask import *
 import threading
+from commands import Commands
 
 pat1 = re.compile(r"(^|[\n ])(([\w]+?://[\w\#$%&~.\-;:=,?@\[\]+]*)(/[\w\#$%&~/.\-;:=,?@\[\]+]*)?)", re.IGNORECASE | re.DOTALL)
 
@@ -203,6 +204,7 @@ class Logbot(SingleServerIRCBot):
         self.chans = [x.lower() for x in channels]
         self.set_ftp()
         self.nick_pass = nick_pass
+        self.commands = Commands()
 
         print("Logbot %s" % __version__)
         print("Connecting to %s:%i..." % (server, port))
@@ -320,6 +322,7 @@ class Logbot(SingleServerIRCBot):
     def on_pubmsg(self, c, e):
 #        if e.arguments()[0].startswith(NICK):
 #            c.privmsg(e.target(), self.format["help"])
+        self.commands.process(c, e)
         self.write_event("pubmsg", e)
 
     def on_pubnotice(self, c, e):

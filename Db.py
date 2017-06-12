@@ -23,11 +23,16 @@ class LogMessage(BaseModel):
     message_type = CharField()
     message = CharField()
 
+class Quote(BaseModel):
+    datetime = DateTimeField()
+    author = CharField()
+    message = CharField()
+
 
 def create_tables():
     database.connect()
     try:
-        database.create_tables([LogMessage, Day, Channel])
+        database.create_tables([Quote, LogMessage, Day, Channel])
     except OperationalError:
         pass # Database already exists
 
@@ -54,6 +59,12 @@ def add_log_message(channel, nickname, message_type, message = None):
             datetime = datetime.datetime.now().strftime("%H:%m:%S"),
             message_type = message_type,
             message = message)
+
+def add_quote(author, message):
+    Quote.create(
+            author = author,
+            message = message,
+            datetime = datetime.datetime.now().strftime("%H:%m:%S"))
 
 def show_all_messages():
     for message in LogMessage.select():
