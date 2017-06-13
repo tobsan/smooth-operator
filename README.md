@@ -8,7 +8,7 @@ Originally this was written by Chris Oliver <chris@excid3.com> with contribution
 
 smooth-operator shows logs using flask, and stores logs using peewee. Install these dependencies using ``pip``:
 
-    pip install flask peewee
+    pip install flask peewee requests
 
 ## Usage
 
