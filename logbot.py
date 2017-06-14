@@ -81,7 +81,7 @@ DEBUG = False
 
 # IRC Server Configuration
 SERVER = os.getenv("IRC_SERVER", "irc.freenode.net")
-PORT = os.getenv("IRC_PORT", 6667)
+PORT = int(os.getenv("IRC_PORT", 6667))
 SERVER_PASS = os.getenv("IRC_SERVER_PASS", None)
 CHANNELS = os.getenv("IRC_CHANNELS", "#pelux").split(",")
 NICK = os.getenv("IRC_NICK", "pelux")
