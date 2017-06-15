@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 """
@@ -70,7 +70,7 @@ flaskapp.config["TEMPLATES_AUTO_RELOAD"] = True
 
 @flaskapp.template_filter('md5')
 def format_md5(value):
-    return md5(value).hexdigest()
+    return md5(value.encode("utf-8")).hexdigest()
 
 def urlify2(value):
     return pat1.sub(r'\1<a href="\2" target="_blank">\3</a>', value)

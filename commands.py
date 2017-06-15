@@ -17,7 +17,7 @@ class Commands:
                 msg = " ".join(msg.split(" ")[1:])
                 self.commands[cmd](c, msg, e.target(), nm_to_n(e.source()))
             else:
-                print "Unknown command", cmd
+                print ("Unknown command", cmd)
 
     def cmd_quote(self, c, msg, target, source):
         replies = [
