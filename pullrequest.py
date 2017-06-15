@@ -16,11 +16,6 @@ class PullRequest:
             },
             {
                 "channel": "#pelux",
-                "name": "meta-bistro",
-                "uri": "https://api.github.com/repos/pelagicore/meta-bistro/pulls"
-            },
-            {
-                "channel": "#pelux",
                 "name": "meta-pelux-bsp-intel",
                 "uri": "https://api.github.com/repos/pelagicore/meta-pelux-bsp-intel/pulls"
             },
@@ -38,6 +33,11 @@ class PullRequest:
                 "channel": "#pelux",
                 "name": "software-factory",
                 "uri": "https://api.github.com/repos/pelagicore/software-factory/pulls"
+            },
+            {
+                "channel": "#pelux",
+                "name": "pelux.io",
+                "uri": "https://api.github.com/repos/pelagicore/pelux.io/pulls"
             }
             ]
 
