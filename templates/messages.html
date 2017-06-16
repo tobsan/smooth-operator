@@ -2,6 +2,23 @@
 <head>
     <title>List of messages</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function modClass(c, disp) {
+            var elems = document.querySelectorAll(c);
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.display = disp;
+            }
+        }
+
+        function toggleClass(c) {
+            var elem = document.querySelectorAll(c)[0];
+            if (elem.style.display == "none") {
+                modClass(c, "");
+            } else {
+                modClass(c, "none");
+            }
+        }
+    </script>
 </head>
 
 <div id="navbar">
@@ -13,6 +30,11 @@
         <input type="text" name="query"/>
         <input type="submit" value="Search"/>
     </form>
+    <button onclick="toggleClass('.join');
+            toggleClass('.part');
+            toggleClass('.quit');">
+        Toggle joins &amp; parts
+    </button>
 </div>
 
 {% for message in messages %}
