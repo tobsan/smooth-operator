@@ -60,6 +60,7 @@ from Db import *
 from flask import *
 import threading
 from commands import Commands
+from chat_and_log import *
 
 pat1 = re.compile(r"(^|[\n ])(([\w]+?://[\w\#$%&~.\-;:=,?@\[\]+]*)(/[\w\#$%&~/.\-;:=,?@\[\]+]*)?)", re.IGNORECASE | re.DOTALL)
 
@@ -250,7 +251,7 @@ class Logbot(SingleServerIRCBot):
         for line in p.check_all():
             message = line["message"]
             channel = line["channel"]
-            c.privmsg(channel, message)
+            chat_and_log(c, channel, message)
             time.sleep(1)
 
         Timer(60*5, self.check_for_prs, [c]).start()
@@ -322,8 +323,8 @@ class Logbot(SingleServerIRCBot):
     def on_pubmsg(self, c, e):
 #        if e.arguments()[0].startswith(NICK):
 #            c.privmsg(e.target(), self.format["help"])
-        self.commands.process(c, e)
         self.write_event("pubmsg", e)
+        self.commands.process(c, e)
 
     def on_pubnotice(self, c, e):
         self.write_event("pubnotice", e)

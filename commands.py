@@ -1,6 +1,7 @@
 from Db import *
 from irclib import nm_to_n
 import random
+from chat_and_log import *
 
 class Commands:
     def __init__(self):
@@ -25,7 +26,7 @@ class Commands:
             "I head from %s that \"%s\"",
             "A wise man (haha, just kidding, it was actually %s) once said \"%s\""
         ]
-        reply = lambda msg: c.privmsg(target, msg)
+        reply = lambda msg: chat_and_log(c, target, msg)
         random_query = Quote.select().order_by(fn.Random())
         try:
             one_quote = random_query.get()
@@ -34,7 +35,7 @@ class Commands:
             reply("I don't know ay quotes :(")
 
     def cmd_remember_quote(self, c, msg, target, source):
-        reply = lambda msg: c.privmsg(target, msg)
+        reply = lambda msg: chat_and_log(c, target, msg)
 
         if (len(msg) > 1):
             add_quote(msg.split(" ")[0], ' '.join(msg.split(" ")[1:]))
