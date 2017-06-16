@@ -12,7 +12,7 @@
 
         function toggleClass(c) {
             var elem = document.querySelectorAll(c)[0];
-            if (elem.style.display == "none") {
+            if (elem && elem.style.display == "none") {
                 modClass(c, "");
             } else {
                 modClass(c, "none");
