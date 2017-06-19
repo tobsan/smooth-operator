@@ -331,6 +331,7 @@ class Logbot(SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
 #        c.privmsg(nm_to_n(e.source()), self.format["help"])
+        self.commands.process(c, e)
         pass
 
     def on_quit(self, c, e):
