@@ -56,12 +56,15 @@ class Commands:
         reply = self.create_reply(c, target, source)
 
         msgparts = msg.split(" ")
-        recipient = msgparts[0]
-        message = " ".join(msgparts[1:])
-        location = target if is_channel(target) else "private"
+        if len(msgparts) < 2:
+            reply("Usage: !tell <recipient> <message>")
+        else:
+            recipient = msgparts[0]
+            message = " ".join(msgparts[1:])
+            location = target if is_channel(target) else "private"
 
-        add_tell_message(source, location, recipient, message)
-        reply("I'll save that message for %s" % recipient)
+            add_tell_message(source, location, recipient, message)
+            reply("I'll save that message for %s" % recipient)
 
     def cmd_get_tell_messages(self, c, msg, target, source):
         reply = self.create_reply(c, target, source)
