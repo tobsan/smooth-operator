@@ -28,11 +28,17 @@ class Quote(BaseModel):
     author = CharField()
     message = CharField()
 
+class Teller(BaseModel):
+    datetime = DateTimeField()
+    author = CharField()
+    location = CharField()
+    recipient = CharField()
+    message = CharField()
 
 def create_tables():
     database.connect()
     try:
-        database.create_tables([Quote, LogMessage, Day, Channel])
+        database.create_tables([Teller, Quote, LogMessage, Day, Channel])
     except OperationalError:
         pass # Database already exists
 
@@ -65,6 +71,24 @@ def add_quote(author, message):
             author = author,
             message = message,
             datetime = datetime.datetime.now().strftime("%H:%M:%S"))
+
+def add_tell_message(author, location, recipient, message):
+    Teller.create(
+            author = author,
+            location = location,
+            recipient = recipient,
+            message = message,
+            datetime = datetime.datetime.now().strftime("%H:%M:%S"))
+
+def get_told_messages(recipient):
+    try:
+        return Teller.select().where(Teller.recipient == recipient);
+    except:
+        return []
+
+def remove_told_messages(recipient):
+    q = Teller.delete().where(Teller.recipient == recipient)
+    q.execute()
 
 def show_all_messages():
     for message in LogMessage.select():
