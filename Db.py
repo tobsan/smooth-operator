@@ -56,7 +56,7 @@ def add_log_message(channel, nickname, message_type, message = None):
             day = get_current_day(),
             channel = get_channel(channel),
             nickname = nickname,
-            datetime = datetime.datetime.now().strftime("%H:%m:%S"),
+            datetime = datetime.datetime.now().strftime("%H:%M:%S"),
             message_type = message_type,
             message = message)
 
@@ -64,7 +64,7 @@ def add_quote(author, message):
     Quote.create(
             author = author,
             message = message,
-            datetime = datetime.datetime.now().strftime("%H:%m:%S"))
+            datetime = datetime.datetime.now().strftime("%H:%M:%S"))
 
 def show_all_messages():
     for message in LogMessage.select():
