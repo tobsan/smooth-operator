@@ -35,10 +35,13 @@ class Teller(BaseModel):
     recipient = CharField()
     message = CharField()
 
+class TellerNotified(BaseModel):
+    recipient = CharField()
+
 def create_tables():
     database.connect()
     try:
-        database.create_tables([Teller, Quote, LogMessage, Day, Channel])
+        database.create_tables([Teller, TellerNotified, Quote, LogMessage, Day, Channel])
     except OperationalError:
         pass # Database already exists
 
@@ -88,6 +91,17 @@ def get_told_messages(recipient):
 
 def remove_told_messages(recipient):
     q = Teller.delete().where(Teller.recipient == recipient)
+    q.execute()
+
+def set_notified(recipient):
+    TellerNotified.create(recipient = recipient)
+
+def is_notified(recipient):
+    result = TellerNotified.select().where(TellerNotified.recipient == recipient).count()
+    return result > 0
+
+def remove_notice(recipient):
+    q = TellerNotified.delete().where(TellerNotified.recipient == recipient)
     q.execute()
 
 def show_all_messages():

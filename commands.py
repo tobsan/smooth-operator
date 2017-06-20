@@ -14,6 +14,10 @@ class Commands:
             "messages": self.cmd_get_tell_messages
         }
 
+        self.handle_all_messages = [
+            self.cmd_check_tell
+        ]
+
     def process(self, c, e):
         msg = e.arguments()[0]
         if msg.startswith("!"):
@@ -23,6 +27,9 @@ class Commands:
                 self.commands[cmd](c, msg, e.target(), nm_to_n(e.source()))
             else:
                 print ("Unknown command", cmd)
+        else:
+            for fun in self.handle_all_messages:
+                fun(c, msg, e.target(), nm_to_n(e.source()))
 
     def create_reply(self, c, target, source):
         reply_target = target if is_channel(target) else source
@@ -53,6 +60,10 @@ class Commands:
             reply("I didn't get that :(")
 
     def cmd_tell(self, c, msg, target, source):
+    """ !tell <recipient> <message>
+
+        The bot will save the given message for the given recipient
+    """
         reply = self.create_reply(c, target, source)
 
         msgparts = msg.split(" ")
@@ -66,7 +77,19 @@ class Commands:
             add_tell_message(source, location, recipient, message)
             reply("I'll save that message for %s" % recipient)
 
+    def cmd_check_tell(self, c, msg, target, source):
+    """ The first time a user interacts so the bot can see it, it will
+        check if there are new messages that the user has not yet been
+        notified of.
+    """
+        if get_told_messages(source) and not is_notified(source):
+            reply = self.create_reply(c, source, source)
+            reply("There are new messages, use !messages to read them")
+            set_notified(source)
+
     def cmd_get_tell_messages(self, c, msg, target, source):
+    """ Print all new messages to the user / channel
+    """
         reply = self.create_reply(c, target, source)
         messages = get_told_messages(source)
         if not messages:
@@ -76,3 +99,4 @@ class Commands:
                 reply("%s said (at %s, in %s): %s" % (message.author, message.datetime, message.location, message.message))
                 time.sleep(1)
             remove_told_messages(source)
+            remove_notice(source)
