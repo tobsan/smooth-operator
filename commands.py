@@ -1,6 +1,6 @@
 from Db import *
 from irclib import nm_to_n, is_channel
-import random
+import random, time
 from chat_and_log import *
 
 class Commands:
@@ -74,4 +74,5 @@ class Commands:
         else:
             for message in messages:
                 reply("%s said (at %s, in %s): %s" % (message.author, message.datetime, message.location, message.message))
+                time.sleep(1)
             remove_told_messages(source)
