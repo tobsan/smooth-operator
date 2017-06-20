@@ -60,10 +60,10 @@ class Commands:
             reply("I didn't get that :(")
 
     def cmd_tell(self, c, msg, target, source):
-    """ !tell <recipient> <message>
+        """ !tell <recipient> <message>
 
-        The bot will save the given message for the given recipient
-    """
+            The bot will save the given message for the given recipient
+        """
         reply = self.create_reply(c, target, source)
 
         msgparts = msg.split(" ")
@@ -78,18 +78,18 @@ class Commands:
             reply("I'll save that message for %s" % recipient)
 
     def cmd_check_tell(self, c, msg, target, source):
-    """ The first time a user interacts so the bot can see it, it will
-        check if there are new messages that the user has not yet been
-        notified of.
-    """
+        """ The first time a user interacts so the bot can see it, it will
+            check if there are new messages that the user has not yet been
+            notified of.
+        """
         if get_told_messages(source) and not is_notified(source):
             reply = self.create_reply(c, source, source)
             reply("There are new messages, use !messages to read them")
             set_notified(source)
 
     def cmd_get_tell_messages(self, c, msg, target, source):
-    """ Print all new messages to the user / channel
-    """
+        """ Print all new messages to the user / channel
+        """
         reply = self.create_reply(c, target, source)
         messages = get_told_messages(source)
         if not messages:
