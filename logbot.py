@@ -73,7 +73,8 @@ app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # The URL prefix on the server
-app.config["APPLICATION_ROOT"] = "/irclogs"
+APPLICATION_ROOT = os.getenv("APPLICATION_ROOT", "/irclocs")
+app.config["APPLICATION_ROOT"] = APPLICATION_ROOT
 
 @app.template_filter('md5')
 def format_md5(value):
