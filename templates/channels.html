@@ -9,12 +9,12 @@
     <a href="..">Back</a>
     {% endif %}
 
-    <form id="searchform" method="get" action="/search/">
+    <form id="searchform" method="get" action="{{ url_prefix | urlencode }}/search/">
         <input type="text" name="query"/>
         <input type="submit" value="Search"/>
     </form>
 </div>
 
 {% for channel in channels %}
-    <li><a href="/channels/{{ channel.name|urlencode }}">{{ channel.name }}</a></li>
+    <li><a href="{{ url_prefix | urlencode }}/channels/{{ channel.name|urlencode }}">{{ channel.name }}</a></li>
 {% endfor %}

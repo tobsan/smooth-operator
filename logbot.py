@@ -66,10 +66,16 @@ pat1 = re.compile(r"(^|[\n ])(([\w]+?://[\w\#$%&~.\-;:=,?@\[\]+]*)(/[\w\#$%&~/.\
 
 #urlfinder = re.compile("(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
 
-flaskapp = Flask(__name__)
-flaskapp.config["TEMPLATES_AUTO_RELOAD"] = True
+# We use a blueprint so that we can have a prefix in the URL
+flaskapp = Blueprint('logbot-blueprint', __name__)
 
-@flaskapp.template_filter('md5')
+app = Flask(__name__)
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+# The URL prefix on the server
+app.config["APPLICATION_ROOT"] = "/irclogs"
+
+@app.template_filter('md5')
 def format_md5(value):
     return md5(value.encode("utf-8")).hexdigest()
 
@@ -130,6 +136,7 @@ def search(channel = None, nickname = None):
                              .where(LogMessage.message.contains(query))
 
     return render_template("messages.html",
+            url_prefix=app.config['APPLICATION_ROOT'],
             messages=messages,
             back_button=False,
             date=True,
@@ -147,6 +154,7 @@ def channel(channel, day = None):
                                     LogMessage.channel == channel)
 
         return render_template("messages.html",
+                url_prefix=app.config['APPLICATION_ROOT'],
                 messages=messages,
                 back_button=True,
                 date=False,
@@ -154,12 +162,19 @@ def channel(channel, day = None):
     else:
         days = LogMessage.select(LogMessage.day).distinct()
         days = [ day.day for day in days ]
-        return render_template("days.html", back_button=True, days=days, channel=channel)
+        return render_template("days.html",
+                url_prefix=app.config['APPLICATION_ROOT'],
+                back_button=True,
+                days=days,
+                channel=channel)
 
 @flaskapp.route("/")
 @flaskapp.route("/channels/")
 def channels():
-    return render_template("channels.html", back_button=True, channels = Channel.select())
+    return render_template("channels.html",
+            url_prefix=app.config['APPLICATION_ROOT'],
+            back_button=True,
+            channels = Channel.select())
 
 
 ### Helper functions
@@ -354,7 +369,10 @@ def main():
     # Start up database
     create_tables()
 
-    t = threading.Thread(target=flaskapp.run, kwargs={"host": "0.0.0.0"})
+    # Register the blueprint. This is a bit of a hack
+    app.register_blueprint(flaskapp, url_prefix=app.config['APPLICATION_ROOT'])
+
+    t = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0"})
     t.daemon = True
     t.start()
 
