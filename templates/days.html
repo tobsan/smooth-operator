@@ -9,7 +9,7 @@
     <a href="..">Back</a>
     {% endif %}
 
-    <form id="searchform" method="get" action="/search/channel/{{channel.name|urlencode}}/">
+    <form id="searchform" method="get" action="{{ url_prefix | urlencode }}/search/channel/{{ channel.name | urlencode }}/">
         <input type="text" name="query"/>
         <input type="submit" value="Search"/>
     </form>
@@ -17,7 +17,7 @@
 
 {% for day in days %}
 <li>
-    <a href="/channels/{{ channel.name|urlencode }}/{{ day.date }}">
+    <a href="{{ url_prefix | urlencode }}/channels/{{ channel.name|urlencode }}/{{ day.date }}">
         {{ day.date }}
     </a>
 </li>
