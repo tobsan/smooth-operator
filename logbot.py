@@ -72,6 +72,9 @@ flaskapp = Blueprint('logbot-blueprint', __name__)
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+# The IP address we bind the web server to
+LISTEN_IP = os.getenv("LISTEN_IP", "0.0.0.0")
+
 # The URL prefix on the server
 APPLICATION_ROOT = os.getenv("APPLICATION_ROOT", "/irclogs")
 app.config["APPLICATION_ROOT"] = APPLICATION_ROOT
@@ -373,7 +376,7 @@ def main():
     # Register the blueprint. This is a bit of a hack
     app.register_blueprint(flaskapp, url_prefix=app.config['APPLICATION_ROOT'])
 
-    t = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0"})
+    t = threading.Thread(target=app.run, kwargs={"host": LISTEN_IP})
     t.daemon = True
     t.start()
 
