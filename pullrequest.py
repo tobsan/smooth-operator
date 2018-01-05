@@ -16,13 +16,8 @@ class PullRequest:
             },
             {
                 "channel": "#pelux",
-                "name": "meta-pelux-bsp-intel",
-                "uri": "https://api.github.com/repos/pelagicore/meta-pelux-bsp-intel/pulls"
-            },
-            {
-                "channel": "#pelux",
-                "name": "meta-pelux-bsp-rpi",
-                "uri": "https://api.github.com/repos/pelagicore/meta-pelux-bsp-rpi/pulls"
+                "name": "meta-template",
+                "uri": "https://api.github.com/repos/pelagicore/meta-template/pulls"
             },
             {
                 "channel": "#pelux",
@@ -31,13 +26,28 @@ class PullRequest:
             },
             {
                 "channel": "#pelux",
+                "name": "pelux-sde",
+                "uri": "https://api.github.com/repos/pelagicore/pelux-sde/pulls"
+            },
+            {
+                "channel": "#pelux",
                 "name": "software-factory",
                 "uri": "https://api.github.com/repos/pelagicore/software-factory/pulls"
             },
             {
                 "channel": "#pelux",
+                "name": "software-factory-blueprint",
+                "uri": "https://api.github.com/repos/pelagicore/software-factory-blueprint/pulls"
+            },
+            {
+                "channel": "#pelux",
                 "name": "pelux.io",
                 "uri": "https://api.github.com/repos/pelagicore/pelux.io/pulls"
+            },
+            {
+                "channel": "#pelux",
+                "name": "smooth-operator",
+                "uri": "https://api.github.com/repos/jonte/smooth-operator/pulls"
             }
             ]
 
